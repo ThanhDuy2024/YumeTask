@@ -1,13 +1,18 @@
+import cookieParser from "cookie-parser";
 import express from "express";
-
-const port = 4000;
+import "dotenv/config"
+import routeClient from "./routes/index.route";
+import { connectDatabase } from "./config/database";
+const port = process.env.PORT;
 const app = express();
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-});
+app.use(express.json());
+app.use(cookieParser());
+connectDatabase();
+
+app.use("/api/client", routeClient)
 
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
-})
+});
