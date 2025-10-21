@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Account } from "../models/Account.model";
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 export const createAccount = async (req: Request, res: Response) => {
   try {
     const check = await Account.findOne({
@@ -54,6 +55,18 @@ export const login = async (req: Request, res: Response) => {
         message: "Mật khẩu của bạn không đúng"
       })
     }
+
+    const token = jwt.sign({
+      username: checkEmail.userName,
+      email: checkEmail.email
+    }, String(process.env.JWT));
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: String(process.env.ENVIROIMENT) == "dev" ? false : true,
+      sameSite: "lax"
+    });
 
     res.status(200).json({
       code: "success",
