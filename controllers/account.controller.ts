@@ -80,3 +80,20 @@ export const login = async (req: Request, res: Response) => {
     })
   }
 }
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("token");
+    
+    res.status(200).json({
+      code: "success",
+      message: "Đăng xuất thành công"
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      code: "errror",
+      message: "Đăng xuất thất bại"
+    })
+  }
+}
