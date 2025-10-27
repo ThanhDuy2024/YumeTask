@@ -13,4 +13,19 @@ export const taskCreate = async (req: Request, res: Response ) => {
       message: "Tạo nhiệm vụ thất bại"
     })
   }
+};
+
+export const taskList = async (req: Request, res: Response) => {
+  try {
+    res.status(200).json({
+      code: "success",
+      data: []
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      code: "error",
+      message: error
+    })
+  }
 }
