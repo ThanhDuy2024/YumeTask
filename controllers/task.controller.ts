@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-export const taskCreate = async (req: Request, res: Response ) => {
+export const createTask = async (req: Request, res: Response ) => {
   try {
     res.status(200).json({
       code: "success",
@@ -26,6 +26,21 @@ export const taskList = async (req: Request, res: Response) => {
     res.status(400).json({
       code: "error",
       message: error
+    })
+  }
+};
+
+export const updateTask = async (req: Request, res: Response) => {
+  try {
+    res.status(200).json({
+      code: "success",
+      message: "Chỉnh sửa thành công"
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      code: "error",
+      message: "Chỉnh sửa thất bại"
     })
   }
 }
