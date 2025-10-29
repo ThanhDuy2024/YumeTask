@@ -44,3 +44,18 @@ export const updateTask = async (req: Request, res: Response) => {
     })
   }
 }
+
+export const deleteTask = async (req: Request, res: Response) => {
+  try {
+    res.status(200).json({
+      code: "success",
+      message: "Xóa thành công"
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      code: "error",
+      message: "Xóa thất bại"
+    })
+  }
+}
