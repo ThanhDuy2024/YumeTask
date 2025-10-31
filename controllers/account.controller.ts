@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { Account } from "../models/Account.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { users } from "../interfaces/account.interface";
+import moment from "moment";
 export const createAccount = async (req: Request, res: Response) => {
   try {
     const check = await Account.findOne({
@@ -94,6 +96,31 @@ export const logout = async (req: Request, res: Response) => {
     res.status(400).json({
       code: "errror",
       message: "Đăng xuất thất bại"
+    })
+  }
+}
+
+export const profileUser = async (req: users, res: Response) => {
+  try {
+    const { id, userName, email, createdAt, updatedAt, } = req.users
+    const createdAtFormat = moment(createdAt).format("DD/MM/YYYY HH:mm");
+    const updatedAtFormat = moment(updatedAt).format("DD/MM/YYYY HH:mm");
+
+    const userData:any = {
+      id: id,
+      userName: userName,
+      email: email,
+      createdAt: createdAtFormat,
+      updatedAt: updatedAtFormat
+    }
+
+    res.status(200).json({
+      data: userData
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      message: ""
     })
   }
 }

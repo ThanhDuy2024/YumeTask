@@ -4,7 +4,7 @@ import Joi from "joi";
 export const createAccountValidate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const schema = Joi.object({
-      username: Joi.string().min(6).max(255).required()
+      userName: Joi.string().min(6).max(255).required()
         .messages({
           "string.empty": "Tên tài khoản không được bỏ trống",
           "string.min": "Tên tài khoản phải có ít nhất 6 ký tự",
