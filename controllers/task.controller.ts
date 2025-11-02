@@ -47,7 +47,7 @@ export const taskList = async (req: users, res: Response) => {
 
       finalData.push(rawData);
     };
-    
+
     res.status(200).json({
       code: "success",
       data: finalData,
@@ -62,8 +62,15 @@ export const taskList = async (req: users, res: Response) => {
   }
 };
 
-export const updateTask = async (req: Request, res: Response) => {
+export const updateTask = async (req: users, res: Response) => {
   try {
+    const { id } = req.params;
+
+    await Task.updateOne({
+      _id: id,
+      userId: req.users.id
+    }, req.body);
+    
     res.status(200).json({
       code: "success",
       message: "Chỉnh sửa thành công"
