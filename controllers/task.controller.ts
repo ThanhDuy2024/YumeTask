@@ -70,7 +70,7 @@ export const updateTask = async (req: users, res: Response) => {
       _id: id,
       userId: req.users.id
     }, req.body);
-    
+
     res.status(200).json({
       code: "success",
       message: "Chỉnh sửa thành công"
@@ -84,8 +84,15 @@ export const updateTask = async (req: users, res: Response) => {
   }
 }
 
-export const deleteTask = async (req: Request, res: Response) => {
+export const deleteTask = async (req: users, res: Response) => {
   try {
+    const { id } = req.params;
+
+    await Task.deleteOne({
+      _id: id,
+      userId: req.users.id
+    });
+    
     res.status(200).json({
       code: "success",
       message: "Xóa thành công"
