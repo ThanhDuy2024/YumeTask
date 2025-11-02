@@ -1,13 +1,20 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { users } from "../interfaces/account.interface";
 import { Task } from "../models/Task.model";
 import moment from "moment";
+import { statusArray } from "../config/variable.config";
 
 export const createTask = async (req: users, res: Response ) => {
   try {
     const task: any = req.body;
 
     task.userId = req.users.id;
+
+    if(!statusArray.includes(task.status)) {
+      return res.status(400).json({
+        message: "Trạng thái không hợp lệ!"
+      })
+    }
     
     await Task.create(task);
 
@@ -27,11 +34,17 @@ export const createTask = async (req: users, res: Response ) => {
 export const taskList = async (req: users, res: Response) => {
   try {
 
-    const list = await Task.find({
-      userId: req.users.id
-    });
+    const findTask:any = {
+      userId: req.users.id,
+    }
 
-    const finalData:any = [];
+    if(statusArray.includes(String(req.query.status))) {
+      findTask.status = req.query.status;
+    }
+
+    const list = await Task.find(findTask);
+
+    const finalData:Array<object> = [];
     for (const item of list) {
       const rawData:any = {
         id: item.id,
