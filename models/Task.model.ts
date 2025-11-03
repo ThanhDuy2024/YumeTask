@@ -12,7 +12,6 @@ const schema = new mongoose.Schema({
   slug: {
     type: String,
     slug: "taskContent",
-    unique: true
   }
 }, {
   timestamps: true

@@ -96,6 +96,14 @@ export const updateTask = async (req: users, res: Response) => {
   try {
     const { id } = req.params;
 
+    const task = await Task.findById(id);
+
+    if(task?.taskContent?.toLowerCase != String(req.body.taskContent).toLowerCase) {
+      const slug = slugify(String(req.body.taskContent), {
+        lower: true
+      });
+      req.body.slug = slug;
+    }
     await Task.updateOne({
       _id: id,
       userId: req.users.id
