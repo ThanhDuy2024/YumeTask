@@ -4,7 +4,7 @@ import { Task } from "../models/Task.model";
 import moment from "moment";
 import { statusArray } from "../config/variable.config";
 import { paginationHelper } from "../helpers/pagination.helper";
-
+import slugify from "slugify";
 export const createTask = async (req: users, res: Response ) => {
   try {
     const task: any = req.body;
@@ -35,10 +35,20 @@ export const createTask = async (req: users, res: Response ) => {
 export const taskList = async (req: users, res: Response) => {
   try {
 
-    const {status, page, skip, limit } = req.query;
+    const {search, status, page, skip, limit } = req.query;
 
     const findTask:any = {
       userId: req.users.id,
+    };
+
+    if(search && String(search).trim() !== "" && String(search).trim() !== '""') {
+      const keyword = slugify(String(search), {
+        lower: true
+      });
+
+      const regex = new RegExp(keyword);
+
+      findTask.slug = regex;
     }
 
     if(statusArray.includes(String(status))) {
