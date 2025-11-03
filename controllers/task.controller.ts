@@ -3,6 +3,7 @@ import { users } from "../interfaces/account.interface";
 import { Task } from "../models/Task.model";
 import moment from "moment";
 import { statusArray } from "../config/variable.config";
+import { paginationHelper } from "../helpers/pagination.helper";
 
 export const createTask = async (req: users, res: Response ) => {
   try {
@@ -34,15 +35,20 @@ export const createTask = async (req: users, res: Response ) => {
 export const taskList = async (req: users, res: Response) => {
   try {
 
+    const {status, page, skip, limit } = req.query;
+
     const findTask:any = {
       userId: req.users.id,
     }
 
-    if(statusArray.includes(String(req.query.status))) {
-      findTask.status = req.query.status;
-    }
+    if(statusArray.includes(String(status))) {
+      findTask.status = status;
+    };
 
-    const list = await Task.find(findTask);
+    const totalTask:number = await Task.countDocuments(findTask);
+    const pagination = paginationHelper(Number(page), Number(skip), Number(limit), totalTask);
+
+    const list = await Task.find(findTask).skip(pagination.skip).limit(Number(limit));
 
     const finalData:Array<object> = [];
     for (const item of list) {
@@ -64,6 +70,7 @@ export const taskList = async (req: users, res: Response) => {
     res.status(200).json({
       code: "success",
       data: finalData,
+      totalPage: pagination.totalPage
     });
 
   } catch (error) {

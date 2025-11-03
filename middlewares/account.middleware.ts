@@ -1,8 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Account } from "../models/Account.model";
 import { users } from "../interfaces/account.interface";
-import { create } from "domain";
 export const accountMiddleware = async (req: users, res: Response, next: NextFunction) =>  {
   try {
 
