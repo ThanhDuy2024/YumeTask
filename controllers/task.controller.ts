@@ -3,7 +3,8 @@ import { users } from "../interfaces/account.interface";
 import { Task } from "../models/Task.model";
 import moment from "moment";
 import { statusArray } from "../config/variable.config";
-
+import { paginationHelper } from "../helpers/pagination.helper";
+import slugify from "slugify";
 export const createTask = async (req: users, res: Response ) => {
   try {
     const task: any = req.body;
@@ -34,15 +35,30 @@ export const createTask = async (req: users, res: Response ) => {
 export const taskList = async (req: users, res: Response) => {
   try {
 
+    const {search, status, page, skip, limit } = req.query;
+
     const findTask:any = {
       userId: req.users.id,
+    };
+
+    if(search && String(search).trim() !== "" && String(search).trim() !== '""') {
+      const keyword = slugify(String(search), {
+        lower: true
+      });
+
+      const regex = new RegExp(keyword);
+
+      findTask.slug = regex;
     }
 
-    if(statusArray.includes(String(req.query.status))) {
-      findTask.status = req.query.status;
-    }
+    if(statusArray.includes(String(status))) {
+      findTask.status = status;
+    };
 
-    const list = await Task.find(findTask);
+    const totalTask:number = await Task.countDocuments(findTask);
+    const pagination = paginationHelper(Number(page), Number(skip), Number(limit), totalTask);
+
+    const list = await Task.find(findTask).skip(pagination.skip).limit(Number(limit));
 
     const finalData:Array<object> = [];
     for (const item of list) {
@@ -64,6 +80,7 @@ export const taskList = async (req: users, res: Response) => {
     res.status(200).json({
       code: "success",
       data: finalData,
+      totalPage: pagination.totalPage
     });
 
   } catch (error) {
@@ -79,6 +96,14 @@ export const updateTask = async (req: users, res: Response) => {
   try {
     const { id } = req.params;
 
+    const task = await Task.findById(id);
+
+    if(task?.taskContent?.toLowerCase != String(req.body.taskContent).toLowerCase) {
+      const slug = slugify(String(req.body.taskContent), {
+        lower: true
+      });
+      req.body.slug = slug;
+    }
     await Task.updateOne({
       _id: id,
       userId: req.users.id
