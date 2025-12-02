@@ -6,7 +6,14 @@ import routeClient from "./routes/index.route";
 import { connectDatabase } from "./config/database";
 const port = process.env.PORT;
 const app = express();
-app.use(cors())
+
+app.use(cors({
+  origin: process.env.ORIGIN_URL,
+  methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 connectDatabase();

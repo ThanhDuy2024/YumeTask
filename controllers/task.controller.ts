@@ -32,10 +32,11 @@ export const createTask = async (req: users, res: Response ) => {
   }
 };
 
+const skip = 0;
 export const taskList = async (req: users, res: Response) => {
   try {
 
-    const {search, status, page, skip, limit } = req.query;
+    const {search, status, page, limit } = req.query;
 
     const findTask:any = {
       userId: req.users.id,
@@ -57,6 +58,7 @@ export const taskList = async (req: users, res: Response) => {
 
     const totalTask:number = await Task.countDocuments(findTask);
     const pagination = paginationHelper(Number(page), Number(skip), Number(limit), totalTask);
+    console.log(pagination);
 
     const list = await Task.find(findTask).skip(pagination.skip).limit(Number(limit));
 
