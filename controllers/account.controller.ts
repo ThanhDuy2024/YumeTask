@@ -13,7 +13,7 @@ export const createAccount = async (req: Request, res: Response) => {
     if(check) {
       return res.status(400).json({
         code: "success",
-        message: "Email đã tồn tại"
+        message: "Email này đã được đăng ký"
       });
     }
 
@@ -25,8 +25,8 @@ export const createAccount = async (req: Request, res: Response) => {
     await Account.create(req.body);
     res.json({
       code: "success",
-      message: "Account has been create!"
-    })
+      message: "Đăng ký tài khoản thành công"
+    });
   } catch (error) {
     console.log(error)
     res.status(400).json({
@@ -45,7 +45,7 @@ export const login = async (req: Request, res: Response) => {
     if(!checkEmail) {
       return res.status(400).json({
         code: "success",
-        message: "Email chưa được đăng ký"
+        message: "Email hoặc mật khẩu không đúng"
       })
     }
 
@@ -54,7 +54,7 @@ export const login = async (req: Request, res: Response) => {
     if(!verifyPassword) {
       return res.status(404).json({
         code: "error",
-        message: "Mật khẩu của bạn không đúng"
+        message: "Email hoặc mật khẩu không đúng"
       })
     }
 
