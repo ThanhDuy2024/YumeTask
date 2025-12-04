@@ -43,8 +43,8 @@ export const login = async (req: Request, res: Response) => {
     });
 
     if(!checkEmail) {
-      return res.status(400).json({
-        code: "success",
+      return res.status(404).json({
+        code: "error",
         message: "Email hoặc mật khẩu không đúng"
       })
     }
