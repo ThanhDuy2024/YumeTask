@@ -67,7 +67,8 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       secure: String(process.env.ENVIROIMENT) == "dev" ? false : true,
-      sameSite: "none"
+      sameSite: "none",
+      partitioned: true
     });
 
     res.status(200).json({
