@@ -67,7 +67,7 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       secure: String(process.env.ENVIROIMENT) == "dev" ? false : true,
-      sameSite: "lax"
+      sameSite: "none"
     });
 
     res.status(200).json({
@@ -120,6 +120,7 @@ export const profileUser = async (req: users, res: Response) => {
   } catch (error) {
     console.log(error);
     res.status(400).json({
+      code: "error",
       message: ""
     })
   }
