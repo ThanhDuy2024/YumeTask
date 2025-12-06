@@ -9,6 +9,7 @@ export const accountMiddleware = async (req: users, res: Response, next: NextFun
 
     if(!token) {
       return res.status(404).json({
+        code: "error",
         message: "Token hết hạn"
       })
     };
@@ -21,6 +22,7 @@ export const accountMiddleware = async (req: users, res: Response, next: NextFun
 
     if(!check) {
       return res.status(404).json({
+        code: "error",
         message: "Không tìm thấy tài khoản"
       })
     }
@@ -37,6 +39,7 @@ export const accountMiddleware = async (req: users, res: Response, next: NextFun
   } catch (error) {
     console.log(error);
     res.status(400).json({
+      code: "error",
       message: "error"
     })
   }
