@@ -60,7 +60,9 @@ export const taskList = async (req: users, res: Response) => {
     const pagination = paginationHelper(Number(page), Number(skip), Number(limit), totalTask);
     console.log(pagination);
 
-    const list = await Task.find(findTask).skip(pagination.skip).limit(Number(limit));
+    const list = await Task.find(findTask).skip(pagination.skip).limit(Number(limit)).sort({
+      createdAt: "desc"
+    });
 
     const finalData:Array<object> = [];
     for (const item of list) {
