@@ -58,9 +58,8 @@ export const taskList = async (req: users, res: Response) => {
 
     const totalTask:number = await Task.countDocuments(findTask);
     const pagination = paginationHelper(Number(page), Number(skip), Number(limit), totalTask);
-    console.log(pagination);
 
-    const list = await Task.find(findTask).skip(pagination.skip).limit(Number(limit)).sort({
+    const list = await Task.find(findTask).sort({
       createdAt: "desc"
     });
 
@@ -145,5 +144,36 @@ export const deleteTask = async (req: users, res: Response) => {
       code: "error",
       message: "Xóa thất bại"
     })
+  }
+}
+
+export const updateStatusTask = async (req: users, res: Response) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findOne({
+      _id: id,
+      userId: req.users.id,
+    });
+
+    if(!task) {
+      return res.json({
+        code: "error",
+        message: "Không tìm thấy nhiệm vụ"
+      });
+    };
+
+    await Task.updateOne({
+      _id: id,
+      userId: req.users.id
+    }, {
+      status: req.body.status
+    });
+
+    res.json({
+      code: "success",
+      message: "Cập nhật trạng thái thành công"
+    })
+  } catch (error) {
+    console.log(error);
   }
 }
