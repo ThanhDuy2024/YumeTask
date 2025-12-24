@@ -55,7 +55,7 @@ export const createAccount = async (req: Request, res: Response) => {
       EX: 5 * 60
     });
 
-    sendEmail(req.body.email, html, subject)
+    //sendEmail(req.body.email, html, subject)
     res.json({
       code: "success",
       message: "OTP đã được gửi đi"
