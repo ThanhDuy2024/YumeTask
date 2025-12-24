@@ -10,72 +10,46 @@ import { sendEmail } from "../helpers/nodemailer.hepler";
 import { client } from "../config/redis.config";
 export const createAccount = async (req: Request, res: Response) => {
   try {
-    const { email, password, userName } = req.body;
+    const check = await Account.findOne({
+      email: req.body.email
+    });
 
-    // 1. Kiểm tra tài khoản tồn tại
-    const check = await Account.findOne({ email });
-    if (check) {
+    if(check) {
       return res.status(400).json({
-        code: "error", // Sửa lại thành error cho đúng logic
+        code: "success",
         message: "Email này đã được đăng ký"
       });
     }
 
-    // 2. Kiểm tra Rate Limit (Chống spam OTP)
-    const checkEmail = await client.get(`email:${email}`);
-    if (checkEmail) {
-      return res.status(429).json({ // 429: Too many requests
-        code: "error",
-        message: "Vui lòng đợi 5 phút trước khi yêu cầu lại mã OTP"
-      });
-    }
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(req.body.password, salt);
 
-    // 3. Hash Password (Dùng Async để tránh block thread)
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
+    req.body.password = hash;
 
     const otp = randomString(6);
-    const html: string = htmlCheckEmail(otp);
-    const subject: string = `OTP XÁC THỰC EMAIL CỦA BẠN`;
+    const html:string = htmlCheckEmail(otp);
+    const subject:string = `OTP XÁC THỰC EMAIL CỦA BẠN`
 
-    const data = { userName, email, password: hash };
+    //Set data
+    const data = {
+      userName: req.body.userName,
+      email: req.body.email,
+      password: req.body.password,
+    };
 
-    // 4. Lưu vào Redis
-    // Sử dụng Promise.all để chạy song song cho nhanh
-    await Promise.all([
-      client.set(`otp:${otp}`, JSON.stringify(data), { EX: 300 }),
-      client.set(`email:${email}`, "active", { EX: 300 })
-    ]);
-
-    // 5. GỬI EMAIL (Đây là chỗ hay gây treo)
-    // Cách an toàn nhất cho Production: Dùng await và bọc try-catch riêng
-    try {
-      await sendEmail(email, html, subject);
-    } catch (sendEmailError) {
-      console.error("Lỗi hàm sendEmail:", sendEmailError);
-      // Nếu không gửi được mail, nên xóa key trong redis để user bấm gửi lại được luôn
-      await client.del(`email:${email}`);
-      return res.status(500).json({
-        code: "error",
-        message: "Hệ thống không thể gửi email lúc này. Vui lòng thử lại sau."
-      });
-    }
-
-    // 6. Trả về kết quả (CHỈ CHẠY KHI MỌI THỨ XONG)
-    return res.status(200).json({
+    sendEmail(req.body.email, html, subject)
+    res.json({
       code: "success",
-      message: "OTP đã được gửi đi thành công"
+      message: "OTP đã được gửi đi",
+      data: data
     });
-
   } catch (error) {
-    console.error("Global Error:", error);
-    // Luôn phải có return res ở catch để tránh treo request khi có lỗi bất ngờ
-    return res.status(500).json({
-      code: "error",
-      message: "Có lỗi xảy ra trên server"
-    });
+    console.log(error)
+    res.status(400).json({
+      message: error
+    })
   }
-};
+}
 
 export const confirmEmail = async (req: Request, res: Response) => {
   try {
