@@ -4,11 +4,13 @@ import express from "express";
 import cors from "cors"
 import routeClient from "./routes/index.route";
 import { connectDatabase } from "./config/database";
+import { connectRedis } from "./config/redis.config";
 const app = express();
 const port = process.env.PORT;
 app.use(express.json());
 app.use(cookieParser());
 connectDatabase();
+connectRedis();
 app.use(cors({
   origin: String(process.env.PORT_FE),
   methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE'],

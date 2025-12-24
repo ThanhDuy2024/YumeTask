@@ -4,6 +4,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { users } from "../interfaces/account.interface";
 import moment from "moment";
+import { htmlCheckEmail } from "../helpers/htmlContext.hepler";
+import { randomString } from "../helpers/randomString.hepler";
+import { sendEmail } from "../helpers/nodemailer.hepler";
+import { client } from "../config/redis.config";
 export const createAccount = async (req: Request, res: Response) => {
   try {
     const check = await Account.findOne({
@@ -22,15 +26,74 @@ export const createAccount = async (req: Request, res: Response) => {
 
     req.body.password = hash;
 
-    await Account.create(req.body);
+    const otp = randomString(6);
+    const html:string = htmlCheckEmail(otp);
+    const subject:string = `OTP XÁC THỰC EMAIL CỦA BẠN`
+
+    const checkEmail = await client.get(`email:${req.body.email}`);
+    if(checkEmail) {
+      return res.status(400).json({
+        code: "error",
+        message: "Sau 5 phút nũa bạn mới được gửi lại OTP"
+      })
+    }
+
+    //Set data
+    const data = {
+      userName: req.body.userName,
+      email: req.body.email,
+      password: req.body.password,
+    };
+    await client.set(`otp:${otp}`, JSON.stringify(data), {
+      EX: 5 * 60
+    });
+    
+    //set email
+    const dataEmail = {
+    }
+    await client.set(`email:${req.body.email}`, JSON.stringify(dataEmail), {
+      EX: 5 * 60
+    });
+
+    sendEmail(req.body.email, html, subject)
     res.json({
       code: "success",
-      message: "Đăng ký tài khoản thành công"
+      message: "OTP đã được gửi đi"
     });
   } catch (error) {
     console.log(error)
     res.status(400).json({
       message: error
+    })
+  }
+}
+
+export const confirmEmail = async (req: Request, res: Response) => {
+  try {
+
+    const { otp } = req.body
+    const getData = await client.get(`otp:${otp}`);
+
+    if(!getData) {
+      return res.status(400).json({
+        code: "error",
+        message: "OTP của bạn bị sai!"
+      })
+    }
+
+    const dataDecode = JSON.parse(getData);
+
+    await Account.create(dataDecode);
+    
+    res.json({
+      code: "success",
+      message: "Đăng ký tài khoản thành công"
+    })
+
+  } catch (error) {
+    res.status(400).json({
+      code: "error",
+      message: "Xác thực email thất bại"
     })
   }
 }
@@ -67,8 +130,8 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       secure: String(process.env.ENVIROIMENT) == "dev" ? false : true,
-      sameSite: "none",
-      partitioned: true
+      sameSite: "lax",
+     // partitioned: true
     });
 
     res.status(200).json({
