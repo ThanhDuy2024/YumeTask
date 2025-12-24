@@ -26,22 +26,23 @@ export const createAccount = async (req: Request, res: Response) => {
 
     req.body.password = hash;
 
-    const otp = randomString(6);
-    const html:string = htmlCheckEmail(otp);
-    const subject:string = `OTP XÁC THỰC EMAIL CỦA BẠN`
+    // const otp = randomString(6);
+    // const html:string = htmlCheckEmail(otp);
+    // const subject:string = `OTP XÁC THỰC EMAIL CỦA BẠN`
 
-    //Set data
-    const data = {
-      userName: req.body.userName,
-      email: req.body.email,
-      password: req.body.password,
-    };
+    // //Set data
+    // const data = {
+    //   userName: req.body.userName,
+    //   email: req.body.email,
+    //   password: req.body.password,
+    // };
 
-    sendEmail(req.body.email, html, subject)
+    // sendEmail(req.body.email, html, subject)
+
+    await Account.create(req.body);
     res.json({
       code: "success",
       message: "OTP đã được gửi đi",
-      data: data
     });
   } catch (error) {
     console.log(error)
