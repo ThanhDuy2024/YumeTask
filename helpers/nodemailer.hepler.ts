@@ -1,32 +1,31 @@
 import nodemailer from 'nodemailer';
 
-export const sendEmail = async (emailUser: string, html: any, subject: string) => {
-  // 1. Khởi tạo transporter
+export const sendEmail = (emailUser:string, html:any, subject:string) => {
+  // Create a transporter object
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    secure: false, 
+    secure: false, // use false for STARTTLS; true for SSL on port 465
     auth: {
-      user: process.env.APP_EMAIL,
-      pass: process.env.APP_PASSWORD,
+      user: String(process.env.APP_EMAIL),
+      pass: String(process.env.APP_PASSWORD),
     }
   });
 
-  // 2. Cấu hình mail options
+  // Configure the mailoptions object
   const mailOptions = {
-    from: `"Tên Ứng Dụng" <${process.env.APP_EMAIL}>`, // Thêm format để chuyên nghiệp hơn
+    from: String(process.env.APP_EMAIL),
     to: emailUser,
     subject: subject,
     html: html
   };
 
-  // 3. Sử dụng try/catch bên trong để bắt lỗi SMTP
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent: ', info.response);
-    return info; // Trả về info để Controller biết là đã xong
-  } catch (error) {
-    console.error('Lỗi SMTP:', error);
-    throw error; // Quan trọng: Phải throw lỗi để Controller catch được
-  }
-};
+  // Send the email
+  transporter.sendMail(mailOptions, function (error:any, info:any) {
+    if (error) {
+      console.log('Error:', error);
+    } else {
+      console.log('Email sent: ', info.response);
+    }
+  });
+}
