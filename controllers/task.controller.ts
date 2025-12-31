@@ -52,7 +52,7 @@ export const taskList = async (req: users, res: Response) => {
       findTask.slug = regex;
     }
 
-    if(statusArray.includes(String(status))) {
+    if(statusArray.includes(String(status)) && status && String(status).trim() !== "" && String(status).trim() !== '""') {
       findTask.status = status;
     };
 
@@ -61,7 +61,7 @@ export const taskList = async (req: users, res: Response) => {
 
     const list = await Task.find(findTask).sort({
       createdAt: "desc"
-    });
+    }).limit(Number(limit)).skip(pagination.skip);
 
     const finalData:Array<object> = [];
     for (const item of list) {
