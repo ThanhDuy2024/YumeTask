@@ -116,6 +116,43 @@ export const taskList = async (req: users, res: Response) => {
   }
 };
 
+export const getAllTask = async (req: users, res: Response) => {
+  try {
+    const find:any = {
+      userId: req.users.id
+    }
+
+    const data:Array<object> = [];
+    const tasks = await Task.find(find);
+
+    for (const item of tasks) {
+      const rawData:any = {
+        id: item._id,
+        userId: item.userId,
+        taskContent: item.taskContent,
+        status: item.status,
+        createdAt: "",
+        updatedAt: "" 
+      }
+
+      rawData.createdAt = moment(item.createdAt).format("HH:mm DD/MM/YYYY");
+      rawData.updatedAt = moment(item.updatedAt).format("HH:mm DD/MM/YYYY");
+
+      data.push(rawData);
+    }
+    
+    res.json({
+      code: "success",
+      data: data
+    })
+  } catch (error) {
+    res.status(400).json({
+      code: "error",
+      message: "Lay task ko thanh cong"
+    })
+  }
+}
+
 export const updateTask = async (req: users, res: Response) => {
   try {
     const { id } = req.params;
