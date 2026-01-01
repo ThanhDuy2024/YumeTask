@@ -5,6 +5,7 @@ import moment from "moment";
 import { statusArray } from "../config/variable.config";
 import { paginationHelper } from "../helpers/pagination.helper";
 import slugify from "slugify";
+import dayjs from "dayjs";
 export const createTask = async (req: users, res: Response ) => {
   try {
     const task: any = req.body;
@@ -36,12 +37,12 @@ const skip = 0;
 export const taskList = async (req: users, res: Response) => {
   try {
 
-    const {search, status, page, limit } = req.query;
-
+    const {search, status, time, page, limit } = req.query;
     const findTask:any = {
       userId: req.users.id,
     };
 
+    //tim kiem nhiem vu
     if(search && String(search).trim() !== "" && String(search).trim() !== '""') {
       const keyword = slugify(String(search), {
         lower: true
@@ -52,9 +53,29 @@ export const taskList = async (req: users, res: Response) => {
       findTask.slug = regex;
     }
 
+    //Loc nhiem vu theo trang thai
     if(statusArray.includes(String(status)) && status && String(status).trim() !== "" && String(status).trim() !== '""') {
       findTask.status = status;
     };
+
+    //Loc theo ngay, thang, nam
+    if(time && time !== "all") {
+      let startDate
+      let endDate = dayjs().endOf('day').toDate(); //cuoi ngay hom nay
+
+      if(time === "today") {
+        startDate = dayjs().startOf('day').toDate(); //bat dau ngay
+      } else if(time === "week") {
+        startDate = dayjs().startOf('week').toDate(); //Ngay bat dau cua tuan
+      } else if (time === "month") {
+        startDate = dayjs().startOf('month').toDate(); //Ngay bat dau cua thang
+      }
+
+      findTask.createdAt = {
+        $gte: startDate,
+        $lte: endDate
+      }
+    }
 
     const totalTask:number = await Task.countDocuments(findTask);
     const pagination = paginationHelper(Number(page), Number(skip), Number(limit), totalTask);
