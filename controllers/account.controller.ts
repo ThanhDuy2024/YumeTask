@@ -111,7 +111,7 @@ export const login = async (req: Request, res: Response) => {
     }, String(process.env.JWT));
 
     res.cookie("token", token, {
-      httpOnly: true, //hông qua lệnh document.cookie) sẽ không thể đọc hoặc sửa đổi cookie này.
+      httpOnly: false, //hông qua lệnh document.cookie) sẽ không thể đọc hoặc sửa đổi cookie này.
       maxAge: 30 * 24 * 60 * 60 * 1000,
       secure: true, 
       sameSite: "none", // Cho phép cross-site cookie
