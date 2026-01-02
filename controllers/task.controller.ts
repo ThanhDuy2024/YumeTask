@@ -131,6 +131,10 @@ export const getAllTask = async (req: users, res: Response) => {
         userId: item.userId,
         taskContent: item.taskContent,
         status: item.status,
+        taskNote: item.taskNote,
+        startTime: item.startTime,
+        endTime: item.endTime,
+        dateTime: item.dateTime,
         createdAt: "",
         updatedAt: "" 
       }
@@ -233,5 +237,35 @@ export const updateStatusTask = async (req: users, res: Response) => {
     })
   } catch (error) {
     console.log(error);
+  }
+}
+
+export const updateTaskAdvan = async (req: users, res: Response) => {
+  try {
+    const task = await Task.findOne({
+      userId: req.users.id,
+      _id: req.params.id
+    });
+
+    if(!task) {
+      return res.status(404).json({
+        code: "success",
+        message: "Task not found"
+      })
+    };
+
+    await task.updateOne(req.body);
+    task.save();
+
+    res.json({
+      code: "success",
+      message: "update task ok!"
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      code: "error",
+      message: "update task error"
+    })
   }
 }
