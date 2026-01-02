@@ -91,6 +91,10 @@ export const taskList = async (req: users, res: Response) => {
         userId: item.userId,
         taskContent: item.taskContent,
         status: item.status,
+        taskNote: item.taskNote,
+        startTime: item.startTime,
+        endTime: item.endTime,
+        dateTime: item.dateTime,
         createdAt: "",
         updatedAt: ""
       };
