@@ -123,8 +123,9 @@ export const getAllTask = async (req: users, res: Response) => {
     }
 
     const data:Array<object> = [];
-    const tasks = await Task.find(find);
-
+    const tasks = await Task.find(find).sort({
+      createdAt: "desc"
+    });
     for (const item of tasks) {
       const rawData:any = {
         id: item._id,
@@ -266,6 +267,22 @@ export const updateTaskAdvan = async (req: users, res: Response) => {
     res.status(400).json({
       code: "error",
       message: "update task error"
+    })
+  }
+}
+
+export const createTaskAdvan = async (req: users, res: Response) => {
+  try {
+    req.body.userId = req.users.id
+    await Task.create(req.body);
+    res.json({
+      code: "success",
+      message: "Create completed"
+    })
+  } catch (error) {
+    res.status(404).json({
+      code: "error",
+      message: "Create task error"
     })
   }
 }
