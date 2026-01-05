@@ -9,6 +9,7 @@ const app = express();
 const port = process.env.PORT;
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 connectDatabase();
 connectRedis();
 app.use(cors({

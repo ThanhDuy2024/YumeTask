@@ -8,8 +8,10 @@ import { htmlCheckEmail } from "../helpers/htmlContext.hepler";
 import { randomString } from "../helpers/randomString.hepler";
 import { sendEmail } from "../helpers/nodemailer.hepler";
 import { client } from "../config/redis.config";
+import { connectDatabase } from "../config/database";
 export const createAccount = async (req: Request, res: Response) => {
   try {
+    await connectDatabase();
     const check = await Account.findOne({
       email: req.body.email
     });
@@ -42,7 +44,7 @@ export const createAccount = async (req: Request, res: Response) => {
     await Account.create(req.body);
     res.json({
       code: "success",
-      message: "OTP đã được gửi đi",
+      message: "Đăng ký thành công",
     });
   } catch (error) {
     console.log(error)
@@ -84,6 +86,7 @@ export const confirmEmail = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
+    await connectDatabase();
     const { email, password } = req.body;
     const checkEmail = await Account.findOne({
       email: email
