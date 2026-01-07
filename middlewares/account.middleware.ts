@@ -17,7 +17,7 @@ export const accountMiddleware = async (req: users, res: Response, next: NextFun
     const decode = jwt.verify(token, String(process.env.JWT)) as JwtPayload;
 
     const check = await Account.findOne({
-      email: decode.email
+      _id: decode.userId
     });
 
     if(!check) {

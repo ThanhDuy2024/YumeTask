@@ -77,7 +77,7 @@ export const taskList = async (req: users, res: Response) => {
       }
     }
 
-    const totalTask:number = await Task.countDocuments(findTask);
+    const totalTask:number = await Task.countDocuments(findTask); //tim ra so luong cua task cua user co trong csdl cua 
     const pagination = paginationHelper(Number(page), Number(skip), Number(limit), totalTask);
 
     const list = await Task.find(findTask).sort({
