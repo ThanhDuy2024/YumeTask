@@ -110,7 +110,7 @@ export const login = async (req: Request, res: Response) => {
 
     const token = jwt.sign({
       username: checkEmail.userName,
-      email: checkEmail.email
+      userId: checkEmail._id
     }, String(process.env.JWT));
 
     res.cookie("token", token, {
